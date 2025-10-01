@@ -1,0 +1,165 @@
+/*
+ * GLOBAL STYLES
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+#root {
+  margin: 0 auto;
+  padding: 0 2rem;
+  text-align: center;
+  font-family: "Poppins", sans-serif;
+  color: #00003c;
+}
+
+body {
+  background: #fefae8;
+  margin: 0;
+  margin-bottom: 100px;
+}
+
+input {
+  width: 300px;
+  border: 1px solid #00003c;
+  border-radius: 30px;
+  padding: 0.75em;
+  margin-bottom: 1em;
+}
+
+.button {
+  appearance: button;
+  background: #d00414;
+  color: #fef9e6;
+  border-radius: 30px;
+  border: 0;
+  padding: 1em 2em;
+  font-weight: 700;
+  font-size: 18px;
+  margin: 1em 0;
+}
+
+.header {
+  display: flex;
+  padding: 2em;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.logo {
+  width: 200px;
+  margin-right: 1em;
+  display: block;
+}
+
+.enrollment {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 2rem;
+}
+
+table:first-of-type {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+table:last-of-type {
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+table {
+  --border: 1px solid #00003c;
+  border-spacing: 0;
+  border-collapse: separate;
+  border: var(--border);
+  overflow: hidden;
+  background: #1ed2af;
+  width: 100%;
+  border: 1px solid black;
+}
+
+table th,
+table td {
+  padding: 0.5em;
+  text-align: center;
+}
+
+table tbody tr:nth-child(even) {
+  background-color: #e5e0cf;
+}
+
+table tbody tr:nth-child(odd) {
+  background-color: #fff;
+}
+
+table th:not(:last-child),
+table td:not(:last-child),
+thead {
+  border-right: var(--border);
+}
+
+table > thead > tr:not(:last-child) > th,
+table > thead > tr:not(:last-child) > td,
+table > tbody > tr:not(:last-child) > th,
+table > tbody > tr:not(:last-child) > td,
+table > tfoot > tr:not(:last-child) > th,
+table > tfoot > tr:not(:last-child) > td,
+table > tr:not(:last-child) > td,
+table > tr:not(:last-child) > th,
+table > thead:not(:last-child),
+table > tbody:not(:last-child),
+table > tfoot:not(:last-child) {
+  border-bottom: var(--border);
+}
+
+th.selected {
+  background: #00003c;
+  color: #fef9e6;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.pagination button {
+  padding: 1rem;
+  border: 1px solid #00003c;
+  background: #1ed2af;
+  color: #00003c;
+  font-weight: 700;
+  width: 100px;
+}
+
+.pagination button[disabled] {
+  background: gray;
+  width: 100px;
+}
+
+.pagination button:first-child {
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.pagination button:last-child {
+  border-top-right-radius: 30px;
+  border-bottom-right-radius: 30px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+button {
+  padding: 1rem;
+  border: 1px solid #00003c;
+  background: #1ed2af;
+  color: #00003c;
+  font-weight: 700;
+  width: 100px;
+  border-radius: 30px;
+}

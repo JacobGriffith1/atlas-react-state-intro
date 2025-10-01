@@ -1,0 +1,237 @@
+[
+  {
+    "trimester": "1",
+    "courseNumber": "OS1000",
+    "courseName": "Fundamentals of Open Source Operating Systems",
+    "semesterCredits": "2.5",
+    "totalClockHours": "37.5"
+  },
+  {
+    "trimester": "1",
+    "courseNumber": "PP1000",
+    "courseName": "Beginning Procedural Programming",
+    "semesterCredits": "2",
+    "totalClockHours": "30"
+  },
+  {
+    "trimester": "1",
+    "courseNumber": "PP1100",
+    "courseName": "Basic Procedural Programming",
+    "semesterCredits": "4",
+    "totalClockHours": "50"
+  },
+  {
+    "trimester": "1",
+    "courseNumber": "PP1200",
+    "courseName": "Intermediate Procedural Programming",
+    "semesterCredits": "4",
+    "totalClockHours": "60"
+  },
+  {
+    "trimester": "1",
+    "courseNumber": "PP1300",
+    "courseName": "Introduction to Data Structures",
+    "semesterCredits": "1.5",
+    "totalClockHours": "37.5"
+  },
+
+  {
+    "trimester": "2",
+    "courseNumber": "OP1000",
+    "courseName": "Foundations of Object-Oriented Programming",
+    "semesterCredits": "2.5",
+    "totalClockHours": "37.5"
+  },
+  {
+    "trimester": "2",
+    "courseNumber": "OP1100",
+    "courseName": "Intermediate Object-Oriented Programming",
+    "semesterCredits": "1",
+    "totalClockHours": "20"
+  },
+  {
+    "trimester": "2",
+    "courseNumber": "WD1000",
+    "courseName": "Beginning Web Development",
+    "semesterCredits": "3",
+    "totalClockHours": "50"
+  },
+  {
+    "trimester": "2",
+    "courseNumber": "SA1000",
+    "courseName": "Introduction to System Administration",
+    "semesterCredits": "2",
+    "totalClockHours": "30"
+  },
+  {
+    "trimester": "2",
+    "courseNumber": "WD1100",
+    "courseName": "Intermediate Web Development",
+    "semesterCredits": "2.5",
+    "totalClockHours": "37.5"
+  },
+  {
+    "trimester": "2",
+    "courseNumber": "WD1200",
+    "courseName": "Advanced Web Development",
+    "semesterCredits": "2.5",
+    "totalClockHours": "37.5"
+  },
+
+  {
+    "trimester": "3",
+    "courseNumber": "PR1400",
+    "courseName": "Professional Development – Web Stack I",
+    "semesterCredits": "3",
+    "totalClockHours": "45"
+  },
+  {
+    "trimester": "3",
+    "courseNumber": "WP1000",
+    "courseName": "Beginning Web Programming",
+    "semesterCredits": "1.5",
+    "totalClockHours": "22.5"
+  },
+  {
+    "trimester": "3",
+    "courseNumber": "WW1000",
+    "courseName": "Beginning Web Stack Design",
+    "semesterCredits": "2",
+    "totalClockHours": "30"
+  },
+  {
+    "trimester": "3",
+    "courseNumber": "WW1100",
+    "courseName": "Foundations of User Interfaces",
+    "semesterCredits": "1.5",
+    "totalClockHours": "22.5"
+  },
+  {
+    "trimester": "3",
+    "courseNumber": "WW1200",
+    "courseName": "Intermediate Web Stack Design",
+    "semesterCredits": "2.5",
+    "totalClockHours": "37.5"
+  },
+  {
+    "trimester": "3",
+    "courseNumber": "WP1100",
+    "courseName": "Foundations of Web Styling",
+    "semesterCredits": "1.5",
+    "totalClockHours": "22.5"
+  },
+  {
+    "trimester": "3",
+    "courseNumber": "WP1200",
+    "courseName": "Intermediate Web Programming",
+    "semesterCredits": "1.5",
+    "totalClockHours": "22.5"
+  },
+  {
+    "trimester": "3",
+    "courseNumber": "WD1300",
+    "courseName": "Beginning Website Integration",
+    "semesterCredits": "2.5",
+    "totalClockHours": "40"
+  },
+
+  {
+    "trimester": "4",
+    "courseNumber": "PR1430",
+    "courseName": "Professional Development - Web Stack II",
+    "semesterCredits": "3",
+    "totalClockHours": "45"
+  },
+  {
+    "trimester": "4",
+    "courseNumber": "WB1000",
+    "courseName": "Foundations of Backend Programming",
+    "semesterCredits": "1",
+    "totalClockHours": "15"
+  },
+  {
+    "trimester": "4",
+    "courseNumber": "WU1000",
+    "courseName": "Beginning User Management",
+    "semesterCredits": "3",
+    "totalClockHours": "45"
+  },
+  {
+    "trimester": "4",
+    "courseNumber": "WB1100",
+    "courseName": "Beginning Backend Programming",
+    "semesterCredits": "1",
+    "totalClockHours": "17.5"
+  },
+  {
+    "trimester": "4",
+    "courseNumber": "WU1100",
+    "courseName": "Beginning Data Storage",
+    "semesterCredits": "1",
+    "totalClockHours": "17.5"
+  },
+  {
+    "trimester": "4",
+    "courseNumber": "WB1200",
+    "courseName": "Intermediate Backend Programming",
+    "semesterCredits": "2.5",
+    "totalClockHours": "40"
+  },
+  {
+    "trimester": "4",
+    "courseNumber": "WP1300",
+    "courseName": "Beginning File Management",
+    "semesterCredits": "1.5",
+    "totalClockHours": "25"
+  },
+  {
+    "trimester": "4",
+    "courseNumber": "WU1200",
+    "courseName": "Data Management",
+    "semesterCredits": "1.5",
+    "totalClockHours": "22.5"
+  },
+  {
+    "trimester": "4",
+    "courseNumber": "WB1300",
+    "courseName": "Advanced Backend Programming",
+    "semesterCredits": "1.5",
+    "totalClockHours": "22.5"
+  },
+
+  {
+    "trimester": "5",
+    "courseNumber": "WD1400",
+    "courseName": "Beginning Website User Interfaces",
+    "semesterCredits": "2",
+    "totalClockHours": "35"
+  },
+  {
+    "trimester": "5",
+    "courseNumber": "WD1500",
+    "courseName": "Intermediate Website User Interfaces",
+    "semesterCredits": "4",
+    "totalClockHours": "60"
+  },
+  {
+    "trimester": "5",
+    "courseNumber": "WD1600",
+    "courseName": "Advanced Website User Interfaces",
+    "semesterCredits": "2.5",
+    "totalClockHours": "40"
+  },
+  {
+    "trimester": "5",
+    "courseNumber": "WD1700",
+    "courseName": "Intermediate Website Integration",
+    "semesterCredits": "1.5",
+    "totalClockHours": "22.5"
+  },
+  {
+    "trimester": "5",
+    "courseNumber": "PRO1400",
+    "courseName": "Professional Seminar - Web Stack",
+    "semesterCredits": "3.5",
+    "totalClockHours": "52.2"
+  }
+]
