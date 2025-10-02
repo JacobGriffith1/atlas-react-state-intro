@@ -1,40 +1,39 @@
-// src/SchoolCatalog.jsx
 import { useEffect, useMemo, useState } from "react";
+import { useEnrollment } from "./context/EnrollmentContext.jsx";
 
 export default function SchoolCatalog() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Sorting
+  // Sorting state
   const [sortKey, setSortKey] = useState(null); // 'trimester'|'number'|'name'|'credits'|'hours'|null
   const [sortDir, setSortDir] = useState("asc"); // 'asc' | 'desc'
 
-  // Search
+  // Search state
   const [query, setQuery] = useState("");
 
   // Pagination
   const PAGE_SIZE = 5;
-  const [page, setPage] = useState(0); // zero-based
+  const [page, setPage] = useState(0);
+
+  // Enrollment
+  const { enroll, isEnrolled } = useEnrollment();
 
   useEffect(() => {
     const ctrl = new AbortController();
-
-    async function load() {
+    (async () => {
       try {
         setLoading(true);
         setError(null);
-
         const res = await fetch("/api/courses.json", { signal: ctrl.signal });
         if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-
         const data = await res.json();
         const list = Array.isArray(data)
           ? data
           : Array.isArray(data?.courses)
             ? data.courses
             : [];
-
         setCourses(list);
       } catch (err) {
         if (err?.name !== "AbortError")
@@ -42,9 +41,7 @@ export default function SchoolCatalog() {
       } finally {
         setLoading(false);
       }
-    }
-
-    load();
+    })();
     return () => ctrl.abort();
   }, []);
 
@@ -56,7 +53,16 @@ export default function SchoolCatalog() {
       const credits = c.semesterCredits ?? "";
       const hours = c.totalClockHours ?? "";
       const key = c.id ?? `${String(number)}-${String(trimester)}-${idx}`;
-      return { key, trimester, number, name, credits, hours, _i: idx };
+      return {
+        key,
+        trimester,
+        number,
+        name,
+        credits,
+        hours,
+        _i: idx,
+        original: c,
+      };
     });
   }, [courses]);
 
@@ -64,11 +70,10 @@ export default function SchoolCatalog() {
   const filteredRows = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return rows;
-    return rows.filter((r) => {
-      const num = String(r.number).toLowerCase();
-      const nm = String(r.name).toLowerCase();
-      return num.includes(q) || nm.includes(q);
-    });
+    return rows.filter(
+      (r) =>
+        r.number.toLowerCase().includes(q) || r.name.toLowerCase().includes(q)
+    );
   }, [rows, query]);
 
   // Compare helper
@@ -117,18 +122,16 @@ export default function SchoolCatalog() {
   const totalPages = Math.ceil(sortedRows.length / PAGE_SIZE);
   const lastPage = Math.max(0, totalPages - 1);
 
-  // Clamp page if results shrink (e.g., search filter) and reset on new search
+  // Reset/clamp pagination as results change
   useEffect(() => {
     setPage(0);
   }, [query]);
-
   useEffect(() => {
     if (page > lastPage) setPage(lastPage);
   }, [page, lastPage]);
 
   const start = page * PAGE_SIZE;
-  const end = start + PAGE_SIZE;
-  const pageRows = sortedRows.slice(start, end);
+  const pageRows = sortedRows.slice(start, start + PAGE_SIZE);
 
   function handleSort(col) {
     if (sortKey === col) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -151,7 +154,6 @@ export default function SchoolCatalog() {
 
   const onPrev = () => setPage((p) => Math.max(0, p - 1));
   const onNext = () => setPage((p) => Math.min(lastPage, p + 1));
-
   const prevDisabled = page === 0 || totalPages === 0;
   const nextDisabled = page >= lastPage || totalPages === 0;
 
@@ -218,7 +220,6 @@ export default function SchoolCatalog() {
               </td>
             </tr>
           )}
-
           {error && !loading && (
             <tr>
               <td colSpan={6} style={{ color: "crimson", textAlign: "center" }}>
@@ -226,7 +227,6 @@ export default function SchoolCatalog() {
               </td>
             </tr>
           )}
-
           {!loading && !error && sortedRows.length === 0 && (
             <tr>
               <td colSpan={6} style={{ textAlign: "center" }}>
@@ -237,20 +237,28 @@ export default function SchoolCatalog() {
 
           {!loading &&
             !error &&
-            pageRows.map((r) => (
-              <tr key={r.key}>
-                <td>{r.trimester}</td>
-                <td>{r.number}</td>
-                <td>{r.name}</td>
-                <td>{r.credits}</td>
-                <td>{r.hours}</td>
-                <td>
-                  <button type="button" disabled>
-                    Enroll
-                  </button>
-                </td>
-              </tr>
-            ))}
+            pageRows.map((r) => {
+              const enrolled = isEnrolled(r.number);
+              return (
+                <tr key={r.key}>
+                  <td>{r.trimester}</td>
+                  <td>{r.number}</td>
+                  <td>{r.name}</td>
+                  <td>{r.credits}</td>
+                  <td>{r.hours}</td>
+                  <td>
+                    <button
+                      type="button"
+                      onClick={() => enroll(r.original)}
+                      disabled={enrolled}
+                      aria-disabled={enrolled}
+                    >
+                      {enrolled ? "Enrolled" : "Enroll"}
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
         </tbody>
       </table>
 
