@@ -1,16 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-/**
- * SchoolCatalog
- *
- * Loads course data from `/api/courses.json`
- * on first render, then renders one row per course.
- * AbortController avoids setting state after unmount.
- */
 export default function SchoolCatalog() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Sorting state
+  const [sortKey, setSortKey] = useState(null); // 'trimester'|'number'|'name'|'credits'|'hours'|null
+  const [sortDir, setSortDir] = useState("asc"); // 'asc' | 'desc'
 
   useEffect(() => {
     const ctrl = new AbortController();
@@ -49,6 +46,80 @@ export default function SchoolCatalog() {
     return () => ctrl.abort(); // Prevent state updates after
   }, []);
 
+  const rows = useMemo(() => {
+    return courses.map((c, idx) => {
+      const trimester = c.trimester ?? "";
+      const number = c.courseNumber ?? "";
+      const name = c.courseName ?? "";
+      const credits = c.semesterCredits ?? "";
+      const hours = c.totalClockHours ?? "";
+      const key = c.id ?? `${String(number)}-${String(trimester)}-${idx}`;
+      return { key, trimester, number, name, credits, hours, _i: idx };
+    });
+  }, [courses]);
+
+  // Natural string compare; numeric if applicable
+  function cmpValues(a, b, numeric) {
+    const isNil = (v) => (v === null) | (v === undefined) || v === "";
+    const an = isNil(a);
+    const bn = isNil(b);
+    if (an && bn) return 0;
+    if (an) return 1; // null/empty last
+    if (bn) return -1;
+
+    if (numeric) {
+      const na =
+        typeof a === "number" ? a : Number(String(a).replace(/[^\d.-]/g, ""));
+      const nb =
+        typeof b === "number" ? b : Number(String(b).replace(/[^\d.-]/g, ""));
+      const aNum = Number.isNaN(na) ? Number.NEGATIVE_INFINITY : na;
+      const bNum = Number.isNaN(nb) ? Number.NEGATIVE_INFINITY : nb;
+      return aNum === bNum ? 0 : aNum < bNum ? -1 : 1;
+    }
+
+    return String(a).localeCompare(String(b), undefined, {
+      numeric: true,
+      sensitivity: "base",
+    });
+  }
+
+  const sortedRows = useMemo(() => {
+    if (!sortKey) return rows;
+    const numericCols = new Set(["credits", "hours"]);
+    const dirMul = sortDir === "asc" ? 1 : -1;
+
+    // copy for immutability + stable sort with index tie-break
+    return [...rows].sort((a, b) => {
+      const primary = cmpValues(
+        a[sortKey],
+        b[sortKey],
+        numericCols.has(sortKey)
+      );
+      if (primary !== 0) return primary * dirMul;
+      return (a._i - b._i) * dirMul;
+    });
+  }, [rows, sortKey, sortDir]);
+
+  function handleSort(col) {
+    if (sortKey === col) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(col);
+      setSortDir("asc");
+    }
+  }
+
+  function headerProps(col) {
+    const active = sortKey === col;
+    const ariaSort = active
+      ? sortDir === "asc"
+        ? "ascending"
+        : "descending"
+      : "none";
+    const arrow = !active ? "↕" : sortDir === "asc" ? "↑" : "↓";
+    return { ariaSort, arrow };
+  }
+
   return (
     <section className="catalog">
       <h1>School Catalog</h1>
@@ -56,12 +127,36 @@ export default function SchoolCatalog() {
       <table>
         <thead>
           <tr>
-            <th>Trimester</th>
-            <th>Course Number</th>
-            <th>Course Name</th>
-            <th>Semester</th>
-            <th>Credits</th>
-            <th>Total Clock Hours</th>
+            <SortableTH
+              label="Trimester"
+              col="trimester"
+              onSort={handleSort}
+              headerProps={headerProps}
+            />
+            <SortableTH
+              label="Course Number"
+              col="number"
+              onSort={handleSort}
+              headerProps={headerProps}
+            />
+            <SortableTH
+              label="Course Name"
+              col="name"
+              onSort={handleSort}
+              headerProps={headerProps}
+            />
+            <SortableTH
+              label="Semester Credits"
+              col="credits"
+              onSort={handleSort}
+              headerProps={headerProps}
+            />
+            <SortableTH
+              label="Total Clock Hours"
+              col="hours"
+              onSort={handleSort}
+              headerProps={headerProps}
+            />
             <th>Enroll</th>
           </tr>
         </thead>
@@ -83,7 +178,7 @@ export default function SchoolCatalog() {
             </tr>
           )}
 
-          {!loading && !error && courses.length === 0 && (
+          {!loading && !error && sortedRows.length === 0 && (
             <tr>
               <td colSpan={7} style={{ textAlign: "center" }}>
                 No courses found.
@@ -93,36 +188,38 @@ export default function SchoolCatalog() {
 
           {!loading &&
             !error &&
-            courses.map((c, idx) => {
-              // Support common naming variations in seed JSON.
-              const trimester = c.trimester ?? c.term ?? "";
-              const courseNumber = c.courseNumber ?? c.number ?? c.code ?? "";
-              const courseName = c.courseName ?? c.name ?? c.title ?? "";
-              const semester = c.semester ?? ""; // Shown if present.
-              const credits = c.credits ?? c.creditHours ?? "";
-              const hours = c.totalClockHours ?? c.clockHours ?? c.hours ?? "";
-
-              const key =
-                c.id ?? `${String(courseNumber)}-${String(trimester)}-${idx}`;
-
-              return (
-                <tr key={key}>
-                  <td>{trimester}</td>
-                  <td>{courseNumber}</td>
-                  <td>{courseName}</td>
-                  <td>{semester}</td>
-                  <td>{credits}</td>
-                  <td>{hours}</td>
-                  <td>
-                    <button type="button" disabled>
-                      Enroll
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
+            sortedRows.map((r) => (
+              <tr key={r.key}>
+                <td>{r.trimester}</td>
+                <td>{r.number}</td>
+                <td>{r.name}</td>
+                <td>{r.credits}</td>
+                <td>{r.hours}</td>
+                <td>
+                  <button type="button" disabled>
+                    Enroll
+                  </button>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
     </section>
+  );
+}
+
+function SortableTH({ label, col, onSort, headerProps }) {
+  const { ariaSort, arrow } = headerProps(col);
+  return (
+    <th aria-sort={ariaSort}>
+      <button
+        type="button"
+        onClick={() => onSort(col)}
+        style={{ all: "unset", cursor: "pointer" }}
+        aria-label={`Sort by ${label} ${ariaSort === "ascending" ? "descending" : "ascending"}`}
+      >
+        {label} <span aria-hidden="true">{arrow}</span>
+      </button>
+    </th>
   );
 }
