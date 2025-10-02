@@ -1,3 +1,4 @@
+// src/SchoolCatalog.jsx
 import { useEffect, useMemo, useState } from "react";
 
 export default function SchoolCatalog() {
@@ -5,12 +6,16 @@ export default function SchoolCatalog() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Sorting state
+  // Sorting
   const [sortKey, setSortKey] = useState(null); // 'trimester'|'number'|'name'|'credits'|'hours'|null
   const [sortDir, setSortDir] = useState("asc"); // 'asc' | 'desc'
 
-  // Search state
+  // Search
   const [query, setQuery] = useState("");
+
+  // Pagination
+  const PAGE_SIZE = 5;
+  const [page, setPage] = useState(0); // zero-based
 
   useEffect(() => {
     const ctrl = new AbortController();
@@ -21,13 +26,9 @@ export default function SchoolCatalog() {
         setError(null);
 
         const res = await fetch("/api/courses.json", { signal: ctrl.signal });
-        if (!res.ok) {
-          throw new Error(`Request failed: ${res.status}`);
-        }
+        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
 
         const data = await res.json();
-
-        // Accept either { courses: [...] } or [...] for convenience.
         const list = Array.isArray(data)
           ? data
           : Array.isArray(data?.courses)
@@ -36,17 +37,15 @@ export default function SchoolCatalog() {
 
         setCourses(list);
       } catch (err) {
-        // Ignore cancellations; report other errors.
-        if (err?.name !== "AbortError") {
+        if (err?.name !== "AbortError")
           setError(err?.message ?? "Unknown error");
-        }
       } finally {
         setLoading(false);
       }
     }
 
     load();
-    return () => ctrl.abort(); // Prevent state updates after
+    return () => ctrl.abort();
   }, []);
 
   const rows = useMemo(() => {
@@ -114,6 +113,23 @@ export default function SchoolCatalog() {
     });
   }, [filteredRows, sortKey, sortDir]);
 
+  // Pagination derived values
+  const totalPages = Math.ceil(sortedRows.length / PAGE_SIZE);
+  const lastPage = Math.max(0, totalPages - 1);
+
+  // Clamp page if results shrink (e.g., search filter) and reset on new search
+  useEffect(() => {
+    setPage(0);
+  }, [query]);
+
+  useEffect(() => {
+    if (page > lastPage) setPage(lastPage);
+  }, [page, lastPage]);
+
+  const start = page * PAGE_SIZE;
+  const end = start + PAGE_SIZE;
+  const pageRows = sortedRows.slice(start, end);
+
   function handleSort(col) {
     if (sortKey === col) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     else {
@@ -132,6 +148,12 @@ export default function SchoolCatalog() {
     const arrow = !active ? "↕" : sortDir === "asc" ? "↑" : "↓";
     return { ariaSort, arrow };
   }
+
+  const onPrev = () => setPage((p) => Math.max(0, p - 1));
+  const onNext = () => setPage((p) => Math.min(lastPage, p + 1));
+
+  const prevDisabled = page === 0 || totalPages === 0;
+  const nextDisabled = page >= lastPage || totalPages === 0;
 
   return (
     <section className="catalog">
@@ -215,7 +237,7 @@ export default function SchoolCatalog() {
 
           {!loading &&
             !error &&
-            sortedRows.map((r) => (
+            pageRows.map((r) => (
               <tr key={r.key}>
                 <td>{r.trimester}</td>
                 <td>{r.number}</td>
@@ -231,6 +253,36 @@ export default function SchoolCatalog() {
             ))}
         </tbody>
       </table>
+
+      {/* Pagination controls */}
+      <div
+        style={{
+          marginTop: "0.75rem",
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+        }}
+      >
+        <button
+          type="button"
+          onClick={onPrev}
+          disabled={prevDisabled}
+          aria-label="Previous page"
+        >
+          Previous
+        </button>
+        <span aria-live="polite">
+          Page {totalPages === 0 ? 0 : page + 1} of {totalPages || 0}
+        </span>
+        <button
+          type="button"
+          onClick={onNext}
+          disabled={nextDisabled}
+          aria-label="Next page"
+        >
+          Next
+        </button>
+      </div>
     </section>
   );
 }
