@@ -9,6 +9,9 @@ export default function SchoolCatalog() {
   const [sortKey, setSortKey] = useState(null); // 'trimester'|'number'|'name'|'credits'|'hours'|null
   const [sortDir, setSortDir] = useState("asc"); // 'asc' | 'desc'
 
+  // Search state
+  const [query, setQuery] = useState("");
+
   useEffect(() => {
     const ctrl = new AbortController();
 
@@ -58,9 +61,20 @@ export default function SchoolCatalog() {
     });
   }, [courses]);
 
-  // Natural string compare; numeric if applicable
+  // Live, case-insensitive filtering by Course Number + Course Name only
+  const filteredRows = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter((r) => {
+      const num = String(r.number).toLowerCase();
+      const nm = String(r.name).toLowerCase();
+      return num.includes(q) || nm.includes(q);
+    });
+  }, [rows, query]);
+
+  // Compare helper
   function cmpValues(a, b, numeric) {
-    const isNil = (v) => (v === null) | (v === undefined) || v === "";
+    const isNil = (v) => v === null || v === undefined || v === "";
     const an = isNil(a);
     const bn = isNil(b);
     if (an && bn) return 0;
@@ -83,13 +97,13 @@ export default function SchoolCatalog() {
     });
   }
 
+  // Sort AFTER filtering
   const sortedRows = useMemo(() => {
-    if (!sortKey) return rows;
+    if (!sortKey) return filteredRows;
     const numericCols = new Set(["credits", "hours"]);
     const dirMul = sortDir === "asc" ? 1 : -1;
 
-    // copy for immutability + stable sort with index tie-break
-    return [...rows].sort((a, b) => {
+    return [...filteredRows].sort((a, b) => {
       const primary = cmpValues(
         a[sortKey],
         b[sortKey],
@@ -98,12 +112,11 @@ export default function SchoolCatalog() {
       if (primary !== 0) return primary * dirMul;
       return (a._i - b._i) * dirMul;
     });
-  }, [rows, sortKey, sortDir]);
+  }, [filteredRows, sortKey, sortDir]);
 
   function handleSort(col) {
-    if (sortKey === col) {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    } else {
+    if (sortKey === col) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else {
       setSortKey(col);
       setSortDir("asc");
     }
@@ -123,6 +136,20 @@ export default function SchoolCatalog() {
   return (
     <section className="catalog">
       <h1>School Catalog</h1>
+
+      {/* Search input: filters by Course Number + Course Name */}
+      <div style={{ margin: "0 0 0.75rem 0" }}>
+        <label>
+          <span style={{ marginRight: 8 }}>Search:</span>
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="e.g. WD1100 or Intermediate Web Development"
+            aria-label="Search by course number or course name"
+          />
+        </label>
+      </div>
 
       <table>
         <thead>
@@ -164,7 +191,7 @@ export default function SchoolCatalog() {
         <tbody>
           {loading && (
             <tr>
-              <td colSpan={7} style={{ textAlign: "center" }}>
+              <td colSpan={6} style={{ textAlign: "center" }}>
                 Loading…
               </td>
             </tr>
@@ -172,7 +199,7 @@ export default function SchoolCatalog() {
 
           {error && !loading && (
             <tr>
-              <td colSpan={7} style={{ color: "crimson", textAlign: "center" }}>
+              <td colSpan={6} style={{ color: "crimson", textAlign: "center" }}>
                 Failed to load courses: {error}
               </td>
             </tr>
@@ -180,7 +207,7 @@ export default function SchoolCatalog() {
 
           {!loading && !error && sortedRows.length === 0 && (
             <tr>
-              <td colSpan={7} style={{ textAlign: "center" }}>
+              <td colSpan={6} style={{ textAlign: "center" }}>
                 No courses found.
               </td>
             </tr>
